@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: ${BD_TEST_URL}
+    username: ${BD_TEST_USUARIO}
+    password: ${BD_TEST_CONTRASENA}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+aplicacion:
+  cancelacion:
+    secreto-hmac: ${SECRETO_HMAC_CANCELACION:secreto-pruebas-con-longitud-suficiente-123456}

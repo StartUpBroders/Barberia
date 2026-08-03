@@ -1,0 +1,34 @@
+{
+  "info": {"name": "Barbería Mimi - API", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json", "description": "Colección sin secretos. Ejecutar Obtener CSRF antes de operaciones de escritura."},
+  "variable": [
+    {"key":"urlBase","value":"http://localhost:8080"},
+    {"key":"slugBarberia","value":"barberia-mimi"},
+    {"key":"csrfToken","value":""},
+    {"key":"cookieSesion","value":""},
+    {"key":"servicioId","value":"1"},
+    {"key":"profesionalId","value":"1"},
+    {"key":"citaId","value":"1"},
+    {"key":"notificacionId","value":"1"}
+  ],
+  "item": [
+    {"name":"Consultar barbería","request":{"method":"GET","url":"{{urlBase}}/api/barberias/{{slugBarberia}}"}},
+    {"name":"Consultar servicios","request":{"method":"GET","url":"{{urlBase}}/api/barberias/{{slugBarberia}}/servicios"}},
+    {"name":"Consultar profesionales","request":{"method":"GET","url":"{{urlBase}}/api/barberias/{{slugBarberia}}/profesionales"}},
+    {"name":"Consultar disponibilidad","request":{"method":"GET","url":"{{urlBase}}/api/barberias/{{slugBarberia}}/disponibilidad?profesionalId={{profesionalId}}&servicioId={{servicioId}}&fecha=2030-09-10"}},
+    {"name":"Obtener CSRF","event":[{"listen":"test","script":{"exec":["pm.collectionVariables.set('csrfToken', pm.response.json().token);"]}}],"request":{"method":"GET","url":"{{urlBase}}/api/autenticacion/csrf"}},
+    {"name":"Crear cita","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"},{"key":"Idempotency-Key","value":"{{$guid}}"}],"body":{"mode":"raw","raw":"{\"nombreCliente\":\"Carlos\",\"telefonoCliente\":\"600123123\",\"correoCliente\":\"carlos@example.com\",\"servicioId\":{{servicioId}},\"profesionalId\":{{profesionalId}},\"fechaInicio\":\"2030-09-10T10:00:00\",\"notaCliente\":\"Nota opcional\"}"},"url":"{{urlBase}}/api/barberias/{{slugBarberia}}/citas"}},
+    {"name":"Cancelar cita","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"telefonoCliente\":\"600123123\",\"codigoCancelacion\":\"00000\"}"},"url":"{{urlBase}}/api/barberias/{{slugBarberia}}/citas/cancelacion"}},
+    {"name":"Iniciar sesión","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"nombreUsuario\":\"mimi\",\"contrasena\":\"CAMBIAR_EN_LOCAL\"}"},"url":"{{urlBase}}/api/autenticacion/iniciar-sesion"}},
+    {"name":"Consultar sesión","request":{"method":"GET","url":"{{urlBase}}/api/autenticacion/sesion"}},
+    {"name":"Cerrar sesión","request":{"method":"POST","header":[{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"url":"{{urlBase}}/api/autenticacion/cerrar-sesion"}},
+    {"name":"Listar citas administrativas","request":{"method":"GET","url":"{{urlBase}}/api/administracion/citas"}},
+    {"name":"Crear servicio","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"nombre\":\"Afeitado\",\"descripcion\":\"Afeitado tradicional\",\"precio\":12.00,\"duracionMinutos\":30}"},"url":"{{urlBase}}/api/administracion/servicios"}},
+    {"name":"Modificar servicio","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"nombre\":\"Corte actualizado\",\"precio\":17.00,\"duracionMinutos\":30}"},"url":"{{urlBase}}/api/administracion/servicios/{{servicioId}}"}},
+    {"name":"Desactivar servicio","request":{"method":"PATCH","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"activo\":false}"},"url":"{{urlBase}}/api/administracion/servicios/{{servicioId}}/estado"}},
+    {"name":"Crear profesional","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"nombre\":\"Nuevo profesional\",\"alias\":\"nuevo\"}"},"url":"{{urlBase}}/api/administracion/profesionales"}},
+    {"name":"Crear horario","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"profesionalId\":{{profesionalId}},\"diaSemana\":\"MONDAY\",\"horaInicio\":\"09:00:00\",\"horaFin\":\"14:00:00\"}"},"url":"{{urlBase}}/api/administracion/horarios"}},
+    {"name":"Bloquear un día","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"body":{"mode":"raw","raw":"{\"profesionalId\":{{profesionalId}},\"fecha\":\"2030-12-24\",\"motivo\":\"Cierre especial\"}"},"url":"{{urlBase}}/api/administracion/dias-bloqueados"}},
+    {"name":"Consultar notificaciones","request":{"method":"GET","url":"{{urlBase}}/api/administracion/notificaciones"}},
+    {"name":"Marcar notificación como leída","request":{"method":"PATCH","header":[{"key":"X-XSRF-TOKEN","value":"{{csrfToken}}"}],"url":"{{urlBase}}/api/administracion/notificaciones/{{notificacionId}}/leida"}}
+  ]
+}

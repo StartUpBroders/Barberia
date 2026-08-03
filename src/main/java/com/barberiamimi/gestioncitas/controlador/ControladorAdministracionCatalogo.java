@@ -1,0 +1,27 @@
+package com.barberiamimi.gestioncitas.controlador;
+import com.barberiamimi.gestioncitas.dto.solicitud.*;
+import com.barberiamimi.gestioncitas.dto.respuesta.*;
+import com.barberiamimi.gestioncitas.seguridad.UsuarioAutenticado;
+import com.barberiamimi.gestioncitas.servicio.ServicioAdministracion;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController @RequestMapping("/api/administracion") @Tag(name="Catálogo administrativo")
+public class ControladorAdministracionCatalogo {
+ private final ServicioAdministracion servicio; public ControladorAdministracionCatalogo(ServicioAdministracion s){servicio=s;}
+ @GetMapping("/servicios") @Operation(summary="Listar todos los servicios") public List<ServicioRespuesta> servicios(@AuthenticationPrincipal UsuarioAutenticado u){return servicio.listarServicios(u);}
+ @PostMapping("/servicios") @Operation(summary="Crear un servicio (PROPIETARIO)") public ResponseEntity<ServicioRespuesta> crearServicio(@AuthenticationPrincipal UsuarioAutenticado u,@Valid @RequestBody SolicitudServicio s){return ResponseEntity.status(HttpStatus.CREATED).body(servicio.crearServicio(u,s));}
+ @PutMapping("/servicios/{id}") @Operation(summary="Actualizar un servicio (PROPIETARIO)") public ServicioRespuesta actualizarServicio(@AuthenticationPrincipal UsuarioAutenticado u,@PathVariable Long id,@Valid @RequestBody SolicitudServicio s){return servicio.actualizarServicio(u,id,s);}
+ @PatchMapping("/servicios/{id}/estado") @Operation(summary="Activar o desactivar un servicio (PROPIETARIO)") public ServicioRespuesta estadoServicio(@AuthenticationPrincipal UsuarioAutenticado u,@PathVariable Long id,@Valid @RequestBody SolicitudEstadoActivo s){return servicio.estadoServicio(u,id,s.activo());}
+ @GetMapping("/profesionales") @Operation(summary="Listar profesionales") public List<ProfesionalRespuesta> profesionales(@AuthenticationPrincipal UsuarioAutenticado u){return servicio.listarProfesionales(u);}
+ @PostMapping("/profesionales") @Operation(summary="Crear un profesional (PROPIETARIO)") public ResponseEntity<ProfesionalRespuesta> crearProfesional(@AuthenticationPrincipal UsuarioAutenticado u,@Valid @RequestBody SolicitudProfesional s){return ResponseEntity.status(HttpStatus.CREATED).body(servicio.crearProfesional(u,s));}
+ @PutMapping("/profesionales/{id}") @Operation(summary="Actualizar un profesional (PROPIETARIO)") public ProfesionalRespuesta actualizarProfesional(@AuthenticationPrincipal UsuarioAutenticado u,@PathVariable Long id,@Valid @RequestBody SolicitudProfesional s){return servicio.actualizarProfesional(u,id,s);}
+ @PatchMapping("/profesionales/{id}/estado") @Operation(summary="Activar o desactivar un profesional (PROPIETARIO)") public ProfesionalRespuesta estadoProfesional(@AuthenticationPrincipal UsuarioAutenticado u,@PathVariable Long id,@Valid @RequestBody SolicitudEstadoActivo s){return servicio.estadoProfesional(u,id,s.activo());}
+ @PostMapping("/usuarios") @Operation(summary="Crear un usuario de la barbería (PROPIETARIO)") public ResponseEntity<UsuarioRespuesta> crearUsuario(@AuthenticationPrincipal UsuarioAutenticado u,@Valid @RequestBody SolicitudCrearUsuario s){return ResponseEntity.status(HttpStatus.CREATED).body(servicio.crearUsuario(u,s));}
+ @PatchMapping("/usuarios/{id}/contrasena") @Operation(summary="Cambiar la contraseña de un usuario (PROPIETARIO)") public MensajeRespuesta cambiarContrasena(@AuthenticationPrincipal UsuarioAutenticado u,@PathVariable Long id,@Valid @RequestBody SolicitudCambiarContrasena s){return servicio.cambiarContrasena(u,id,s);}
+}

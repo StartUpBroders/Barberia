@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: gestion-citas
+  datasource:
+    url: ${BD_URL}
+    username: ${BD_USUARIO}
+    password: ${BD_CONTRASENA}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Europe/Madrid
+  jackson:
+    default-property-inclusion: non_null
+  session:
+    timeout: 30m
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${COOKIE_SEGURA:false}
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+aplicacion:
+  cancelacion:
+    maximo-intentos: 5
+    ventana-minutos: 15
+    bloqueo-minutos: 15
+    horas-limite: 24
+    secreto-hmac: ${SECRETO_HMAC_CANCELACION}
+  autenticacion:
+    maximo-intentos: 5
+    bloqueo-minutos: 15
+  disponibilidad:
+    intervalo-minutos: 15
+  privacidad:
+    meses-conservacion-datos-clientes: 24
+  cors:
+    origenes-permitidos:
+      - http://localhost:3000
