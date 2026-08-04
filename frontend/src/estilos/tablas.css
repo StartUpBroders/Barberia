@@ -1,0 +1,22 @@
+.tabla-contenedor { overflow-x: auto; border: 1px solid var(--color-borde); border-radius: var(--radio-borde); background: var(--color-superficie); box-shadow: var(--sombra-tarjeta); }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 14px 15px; border-bottom: 1px solid var(--color-borde); text-align: left; vertical-align: middle; }
+th { color: var(--color-texto-suave); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+tbody tr:last-child td { border-bottom: 0; }
+.acciones { display: flex; gap: 8px; align-items: center; }
+.acciones button, .tarjeta-gestion button, .notificacion button { border: 0; background: transparent; color: var(--color-primario); font-weight: 750; text-decoration: underline; text-underline-offset: 3px; }
+.acciones select { min-width: 160px; padding: 6px; min-height: 35px; }
+.acciones .accion-peligro, .accion-peligro { color: var(--color-error); }
+.insignia, .etiqueta { display: inline-flex; border-radius: 999px; padding: 4px 9px; background: #29292f; font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.estado-confirmada, .estado-completada { background: #103122; color: #77e4ad; }
+.estado-reservada { background: #352507; color: #ffd166; }
+.estado-cancelada_por_cliente, .estado-cancelada_por_barberia, .estado-no_presentado { background: #351119; color: #ff8c9e; }
+@media (max-width: 760px) {
+  .tabla-contenedor { overflow: visible; border: 0; background: transparent; box-shadow: none; }
+  table, thead, tbody, tr, th, td { display: block; }
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  tr { margin-bottom: 14px; padding: 12px; border: 1px solid var(--color-borde); border-radius: var(--radio-borde); background: var(--color-superficie); box-shadow: var(--sombra-tarjeta); }
+  td { display: grid; grid-template-columns: 105px 1fr; border: 0; padding: 7px; }
+  td::before { content: attr(data-label); color: var(--color-texto-suave); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
+  .acciones { align-items: start; flex-wrap: wrap; }
+}

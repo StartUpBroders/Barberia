@@ -1,0 +1,1 @@
+export function MensajeEstado({ tipo = 'informacion', children }) { if (!children) return null; return <div className={`mensaje mensaje-${tipo}`} role={tipo === 'error' ? 'alert' : 'status'} aria-live="polite">{children}</div>; }

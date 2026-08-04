@@ -14,24 +14,34 @@ import java.time.LocalDateTime;
 
 @Service
 public class ServicioCitas {
-    private final ServicioCatalogoPublico catalogo; private final RepositorioServicio servicios; private final RepositorioProfesional profesionales;
+    private final ServicioCatalogoPublico catalogo; private final RepositorioBarberia barberias; private final RepositorioServicio servicios; private final RepositorioProfesional profesionales;
     private final RepositorioCita citas; private final ServicioDisponibilidad disponibilidad; private final UtilidadCriptografica criptografia; private final PropiedadesAplicacion propiedades;
-    public ServicioCitas(ServicioCatalogoPublico ca,RepositorioServicio s,RepositorioProfesional p,RepositorioCita c,ServicioDisponibilidad d,UtilidadCriptografica u,PropiedadesAplicacion pr){catalogo=ca;servicios=s;profesionales=p;citas=c;disponibilidad=d;criptografia=u;propiedades=pr;}
+    public ServicioCitas(ServicioCatalogoPublico ca,RepositorioBarberia ba,RepositorioServicio s,RepositorioProfesional p,RepositorioCita c,ServicioDisponibilidad d,UtilidadCriptografica u,PropiedadesAplicacion pr){catalogo=ca;barberias=ba;servicios=s;profesionales=p;citas=c;disponibilidad=d;criptografia=u;propiedades=pr;}
     @Transactional
     public CitaCreadaRespuesta crear(String slug,String claveIdempotencia,SolicitudCrearCita solicitud){
+        return crearInterna(catalogo.buscarBarberia(slug),claveIdempotencia,solicitud,false);
+    }
+    @Transactional
+    public CitaCreadaRespuesta crearPublica(String slug,String claveIdempotencia,SolicitudCrearCita solicitud){
+        Barberia barberia=barberias.bloquearPorSlug(slug).orElseThrow(()->new RecursoNoEncontradoExcepcion("La barbería no existe o no está activa."));
+        return crearInterna(barberia,claveIdempotencia,solicitud,true);
+    }
+    private CitaCreadaRespuesta crearInterna(Barberia b,String claveIdempotencia,SolicitudCrearCita solicitud,boolean aplicarLimiteTelefono){
         if(claveIdempotencia==null||claveIdempotencia.isBlank()||claveIdempotencia.length()>100)throw new SolicitudInvalidaExcepcion("La cabecera Idempotency-Key es obligatoria y debe tener entre 1 y 100 caracteres.");
-        Barberia b=catalogo.buscarBarberia(slug); String clave=claveIdempotencia.trim(); String huella=crearHuella(solicitud);
+        String clave=claveIdempotencia.trim(); String huella=crearHuella(solicitud);
         var anterior=citas.findByBarberiaIdAndClaveIdempotencia(b.getId(),clave);
         if(anterior.isPresent()){if(!anterior.get().getHuellaSolicitud().equals(huella))throw new RecursoDuplicadoExcepcion("La clave de idempotencia ya se utilizó con datos diferentes.");return respuesta(anterior.get(),null,true);}
+        String telefono=normalizarTelefono(solicitud.telefonoCliente());
+        if(aplicarLimiteTelefono&&citas.countByBarberiaIdAndTelefonoClienteAndEstadoAndFechaInicioAfter(b.getId(),telefono,com.barberiamimi.gestioncitas.enumeracion.EstadoCita.CONFIRMADA,LocalDateTime.now())>=propiedades.getReservasPublicas().getMaximoCitasFuturasPorTelefono())throw new LimiteCitasFuturasExcepcion();
         Servicio s=servicios.findByIdAndBarberiaIdAndActivoTrue(solicitud.servicioId(),b.getId()).orElseThrow(()->new RecursoNoEncontradoExcepcion("El servicio no existe o no está activo."));
         Profesional p=profesionales.findByIdAndBarberiaIdAndActivoTrue(solicitud.profesionalId(),b.getId()).orElseThrow(()->new RecursoNoEncontradoExcepcion("El profesional no existe o no está activo."));
-        LocalDateTime fin=solicitud.fechaInicio().plusMinutes(s.getDuracionMinutos()); disponibilidad.validarDisponible(b.getId(),p.getId(),solicitud.fechaInicio(),fin);
-        String codigo=criptografia.generarCodigoCancelacion(); Cita cita=new Cita(b,p,s,limpiar(solicitud.nombreCliente()),limpiar(solicitud.telefonoCliente()),limpiarNullable(solicitud.correoCliente()),solicitud.fechaInicio(),fin,limpiarNullable(solicitud.notaCliente()),null,clave,huella);
+        LocalDateTime fin=solicitud.fechaInicio().plusMinutes(b.getIntervaloMinutos()); disponibilidad.validarDisponible(b.getId(),p.getId(),solicitud.fechaInicio(),fin);
+        String codigo=criptografia.generarCodigoCancelacion(); Cita cita=new Cita(b,p,s,limpiar(solicitud.nombreCliente()),telefono,solicitud.fechaInicio(),fin,limpiarNullable(solicitud.notaCliente()),null,clave,huella);
         try{citas.saveAndFlush(cita);}catch(DataIntegrityViolationException e){throw new CitaNoDisponibleExcepcion("El horario seleccionado acaba de ser reservado por otro cliente.");}
         cita.setCodigoCancelacionHmac(criptografia.hmac(codigo+":"+cita.getId(),propiedades.getCancelacion().getSecretoHmac())); citas.save(cita);
         return respuesta(cita,codigo,false);
     }
-    private String crearHuella(SolicitudCrearCita s){return criptografia.sha256(String.join("|",limpiar(s.nombreCliente()),limpiar(s.telefonoCliente()),String.valueOf(s.correoCliente()),s.servicioId().toString(),s.profesionalId().toString(),s.fechaInicio().toString(),String.valueOf(s.notaCliente())));}
+    private String crearHuella(SolicitudCrearCita s){return criptografia.sha256(String.join("|",limpiar(s.nombreCliente()),normalizarTelefono(s.telefonoCliente()),s.servicioId().toString(),s.profesionalId().toString(),s.fechaInicio().toString(),String.valueOf(s.notaCliente())));}
     private CitaCreadaRespuesta respuesta(Cita c,String codigo,boolean repetida){return new CitaCreadaRespuesta(c.getId(),c.getBarberia().getNombre(),c.getProfesional().getNombre(),c.getNombreServicioReservado(),c.getPrecioServicioReservado(),c.getDuracionServicioMinutosReservada(),c.getFechaInicio(),c.getFechaFin(),c.getEstado(),codigo,repetida?"La petición ya se había procesado; se devuelve la cita existente.":"La cita se ha creado correctamente. Guarda el código de cancelación.",repetida);}
-    private String limpiar(String v){return v.trim();} private String limpiarNullable(String v){return v==null||v.isBlank()?null:v.trim();}
+    private String limpiar(String v){return v.trim();} private String normalizarTelefono(String v){return v.replaceAll("\\s+","");} private String limpiarNullable(String v){return v==null||v.isBlank()?null:v.trim();}
 }

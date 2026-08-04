@@ -21,7 +21,7 @@ import java.util.List;
 public class ConfiguracionSeguridad {
     @Bean PasswordEncoder codificadorContrasenas(){return new BCryptPasswordEncoder(12);}
     @Bean AuthenticationManager gestorAutenticacion(AuthenticationConfiguration c)throws Exception{return c.getAuthenticationManager();}
-    @Bean CorsConfigurationSource fuenteCors(PropiedadesAplicacion p){CorsConfiguration c=new CorsConfiguration();c.setAllowedOrigins(p.getCors().getOrigenesPermitidos());c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));c.setAllowedHeaders(List.of("Content-Type","X-XSRF-TOKEN","Idempotency-Key"));c.setAllowCredentials(true);UrlBasedCorsConfigurationSource f=new UrlBasedCorsConfigurationSource();f.registerCorsConfiguration("/**",c);return f;}
+    @Bean CorsConfigurationSource fuenteCors(PropiedadesAplicacion p){CorsConfiguration c=new CorsConfiguration();c.setAllowedOrigins(p.getCors().getOrigenesPermitidos());c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));c.setAllowedHeaders(List.of("Content-Type","X-XSRF-TOKEN","Idempotency-Key","Turnstile-Token"));c.setAllowCredentials(true);UrlBasedCorsConfigurationSource f=new UrlBasedCorsConfigurationSource();f.registerCorsConfiguration("/**",c);return f;}
     @Bean SecurityFilterChain cadena(HttpSecurity http,ObjectMapper json)throws Exception{
         CookieCsrfTokenRepository csrf=CookieCsrfTokenRepository.withHttpOnlyFalse();csrf.setCookieName("XSRF-TOKEN");
         http.cors(c->{}).csrf(c->c.csrfTokenRepository(csrf))

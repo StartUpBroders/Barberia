@@ -5,9 +5,13 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE barberias (
  id BIGSERIAL PRIMARY KEY, nombre VARCHAR(120) NOT NULL, slug VARCHAR(80) NOT NULL UNIQUE,
- telefono VARCHAR(20), correo VARCHAR(150), direccion VARCHAR(250), activa BOOLEAN NOT NULL DEFAULT TRUE,
+ telefono VARCHAR(20), direccion VARCHAR(250), instagram VARCHAR(120),
+ url_google_maps VARCHAR(1000), mostrar_ubicacion BOOLEAN NOT NULL DEFAULT FALSE, activa BOOLEAN NOT NULL DEFAULT TRUE,
+ intervalo_minutos INTEGER NOT NULL DEFAULT 30, dias_antelacion_reserva INTEGER NOT NULL DEFAULT 30,
  fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, fecha_actualizacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
- CONSTRAINT ck_barberia_slug CHECK (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$')
+ CONSTRAINT ck_barberia_slug CHECK (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
+ CONSTRAINT ck_barberia_intervalo CHECK (intervalo_minutos BETWEEN 5 AND 180),
+ CONSTRAINT ck_barberia_antelacion CHECK (dias_antelacion_reserva BETWEEN 1 AND 365)
 );
 
 CREATE TABLE profesionales (
@@ -40,10 +44,17 @@ CREATE TABLE dias_bloqueados (
  CONSTRAINT ck_bloqueo_franja CHECK ((hora_inicio IS NULL AND hora_fin IS NULL) OR (hora_inicio IS NOT NULL AND hora_fin > hora_inicio))
 );
 
+CREATE TABLE dias_trabajo_especial (
+ id BIGSERIAL PRIMARY KEY, barberia_id BIGINT NOT NULL REFERENCES barberias(id), profesional_id BIGINT NOT NULL REFERENCES profesionales(id),
+ fecha DATE NOT NULL, hora_inicio TIME NOT NULL, hora_fin TIME NOT NULL, fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT ck_trabajo_especial_orden CHECK (hora_fin > hora_inicio)
+);
+CREATE INDEX ix_trabajo_especial_fecha ON dias_trabajo_especial(barberia_id,profesional_id,fecha);
+
 CREATE TABLE citas (
  id BIGSERIAL PRIMARY KEY, barberia_id BIGINT NOT NULL REFERENCES barberias(id), profesional_id BIGINT NOT NULL REFERENCES profesionales(id),
  servicio_id BIGINT NOT NULL REFERENCES servicios(id), nombre_cliente VARCHAR(100) NOT NULL, telefono_cliente VARCHAR(20) NOT NULL,
- correo_cliente VARCHAR(150), fecha_inicio TIMESTAMP NOT NULL, fecha_fin TIMESTAMP NOT NULL, nota_cliente VARCHAR(1000),
+ fecha_inicio TIMESTAMP NOT NULL, fecha_fin TIMESTAMP NOT NULL, nota_cliente VARCHAR(1000),
  codigo_cancelacion_hmac VARCHAR(64), estado VARCHAR(30) NOT NULL, cancelada_por VARCHAR(12), motivo_cancelacion VARCHAR(500),
  fecha_cancelacion TIMESTAMP, nombre_servicio_reservado VARCHAR(120) NOT NULL, precio_servicio_reservado NUMERIC(10,2) NOT NULL,
  duracion_servicio_minutos_reservada INTEGER NOT NULL, clave_idempotencia VARCHAR(100) NOT NULL, huella_solicitud VARCHAR(64) NOT NULL,
@@ -66,6 +77,7 @@ CREATE TABLE usuarios_administracion (
  fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, fecha_actualizacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
  CONSTRAINT ck_usuario_rol CHECK (rol IN ('PROPIETARIO','BARBERO'))
 );
+CREATE UNIQUE INDEX ux_usuario_profesional ON usuarios_administracion(profesional_id) WHERE profesional_id IS NOT NULL;
 
 CREATE TABLE notificaciones (
  id BIGSERIAL PRIMARY KEY, barberia_id BIGINT NOT NULL REFERENCES barberias(id), profesional_id BIGINT REFERENCES profesionales(id),
@@ -101,6 +113,7 @@ ALTER TABLE auditorias_administrativas ADD CONSTRAINT fk_auditoria_usuario_barbe
 CREATE INDEX idx_profesionales_barberia ON profesionales(barberia_id, activo);
 CREATE INDEX idx_servicios_barberia ON servicios(barberia_id, activo);
 CREATE INDEX idx_horarios_busqueda ON horarios_trabajo(barberia_id, profesional_id, dia_semana, activo);
+CREATE UNIQUE INDEX ux_horario_tramo ON horarios_trabajo(barberia_id, profesional_id, dia_semana, hora_inicio, hora_fin);
 CREATE INDEX idx_dias_bloqueados_busqueda ON dias_bloqueados(barberia_id, profesional_id, fecha);
 CREATE INDEX idx_citas_barberia_fecha ON citas(barberia_id, fecha_inicio);
 CREATE INDEX idx_citas_profesional_fecha ON citas(profesional_id, fecha_inicio);
@@ -108,7 +121,15 @@ CREATE INDEX idx_citas_telefono ON citas(barberia_id, telefono_cliente) WHERE an
 CREATE INDEX idx_notificaciones_no_leidas ON notificaciones(barberia_id, leida, fecha_creacion DESC);
 CREATE INDEX idx_intento_cancelacion_busqueda ON intentos_cancelacion(barberia_id, huella_origen, fecha_intento);
 
-INSERT INTO barberias(nombre,slug,telefono,correo,direccion) VALUES ('Barbería Mimi','barberia-mimi','600000000','mimi@example.invalid','Dirección de desarrollo');
+CREATE TABLE intentos_reserva (
+ id BIGSERIAL PRIMARY KEY,
+ barberia_id BIGINT NOT NULL REFERENCES barberias(id),
+ huella_origen VARCHAR(64) NOT NULL,
+ fecha_intento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_intento_reserva_busqueda ON intentos_reserva(barberia_id, huella_origen, fecha_intento);
+
+INSERT INTO barberias(nombre,slug,telefono,direccion,url_google_maps,mostrar_ubicacion) VALUES ('Barbería Mimi','barberia-mimi','600000000','C. Pastores, 1A, 41130 La Puebla del Río, Sevilla','https://www.google.com/maps/place/C.+Pastores,+1A,+41130+La+Puebla+del+R%C3%ADo,+Sevilla/@37.2652564,-6.0651401,19z',TRUE);
 INSERT INTO profesionales(barberia_id,nombre,alias) SELECT id,'Mimi','mimi' FROM barberias WHERE slug='barberia-mimi';
 INSERT INTO servicios(barberia_id,nombre,descripcion,precio,duracion_minutos)
  SELECT id,'Corte','Corte de cabello',15.00,30 FROM barberias WHERE slug='barberia-mimi'
@@ -116,7 +137,7 @@ INSERT INTO servicios(barberia_id,nombre,descripcion,precio,duracion_minutos)
  UNION ALL SELECT id,'Tinte','Servicio de tinte',30.00,60 FROM barberias WHERE slug='barberia-mimi';
 INSERT INTO horarios_trabajo(barberia_id,profesional_id,dia_semana,hora_inicio,hora_fin)
  SELECT b.id,p.id,d.dia,'09:00','14:00' FROM barberias b JOIN profesionales p ON p.barberia_id=b.id
- CROSS JOIN (VALUES ('MONDAY'),('TUESDAY'),('WEDNESDAY'),('THURSDAY'),('FRIDAY'),('SATURDAY')) d(dia) WHERE b.slug='barberia-mimi';
+ CROSS JOIN (VALUES ('MONDAY'),('TUESDAY'),('WEDNESDAY'),('THURSDAY'),('FRIDAY')) d(dia) WHERE b.slug='barberia-mimi';
 INSERT INTO horarios_trabajo(barberia_id,profesional_id,dia_semana,hora_inicio,hora_fin)
  SELECT b.id,p.id,d.dia,'16:00','20:00' FROM barberias b JOIN profesionales p ON p.barberia_id=b.id
  CROSS JOIN (VALUES ('MONDAY'),('TUESDAY'),('WEDNESDAY'),('THURSDAY'),('FRIDAY')) d(dia) WHERE b.slug='barberia-mimi';

@@ -3,6 +3,8 @@ package com.barberiamimi.gestioncitas.excepcion;
 import com.barberiamimi.gestioncitas.dto.respuesta.ErrorRespuesta;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,10 @@ public class ManejadorGlobalExcepciones {
     @ExceptionHandler(DataIntegrityViolationException.class)
     ResponseEntity<ErrorRespuesta> manejarIntegridad(DataIntegrityViolationException e,HttpServletRequest p){
         return responder(HttpStatus.CONFLICT,"CONFLICTO_DE_DATOS","La operación entra en conflicto con datos existentes.",List.of(),p);
+    }
+    @ExceptionHandler({CannotCreateTransactionException.class,DataAccessException.class})
+    ResponseEntity<ErrorRespuesta> manejarBaseDatos(Exception e,HttpServletRequest p){
+        return responder(HttpStatus.SERVICE_UNAVAILABLE,"BASE_DATOS_NO_DISPONIBLE","La agenda no puede conectarse con la base de datos en este momento. Inténtalo de nuevo en unos segundos.",List.of(),p);
     }
     @ExceptionHandler(AuthenticationException.class)
     ResponseEntity<ErrorRespuesta> manejarAutenticacion(AuthenticationException e,HttpServletRequest p){return responder(HttpStatus.UNAUTHORIZED,"CREDENCIALES_INVALIDAS","El usuario o la contraseña no son válidos.",List.of(),p);}

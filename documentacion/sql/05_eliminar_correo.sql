@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE citas DROP COLUMN IF EXISTS correo_cliente;
+ALTER TABLE barberias DROP COLUMN IF EXISTS correo;
+
+COMMIT;

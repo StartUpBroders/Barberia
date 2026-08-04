@@ -1,0 +1,1 @@
+export function EstadoCarga({ texto = 'Cargando…' }) { return <div className="estado estado-carga" role="status" aria-live="polite"><span className="indicador-carga" aria-hidden="true" />{texto}</div>; }

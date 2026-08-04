@@ -20,7 +20,7 @@ public class UsuarioAdministracion extends EntidadAuditable {
     public UsuarioAdministracion(Barberia b,Profesional p,String nombre,String hash,RolUsuario rol){barberia=b;profesional=p;nombreUsuario=nombre;contrasenaHash=hash;this.rol=rol;}
     public Long getId(){return id;} public Barberia getBarberia(){return barberia;} public Profesional getProfesional(){return profesional;}
     public String getNombreUsuario(){return nombreUsuario;} public String getContrasenaHash(){return contrasenaHash;}
-    public void setContrasenaHash(String v){contrasenaHash=v;} public RolUsuario getRol(){return rol;} public boolean isActivo(){return activo;}
+    public void setNombreUsuario(String v){nombreUsuario=v;} public void setContrasenaHash(String v){contrasenaHash=v;} public RolUsuario getRol(){return rol;} public boolean isActivo(){return activo;} public void setActivo(boolean v){activo=v;}
     public int getIntentosFallidos(){return intentosFallidos;} public void setIntentosFallidos(int v){intentosFallidos=v;}
     public LocalDateTime getFechaBloqueo(){return fechaBloqueo;} public void setFechaBloqueo(LocalDateTime v){fechaBloqueo=v;}
 }

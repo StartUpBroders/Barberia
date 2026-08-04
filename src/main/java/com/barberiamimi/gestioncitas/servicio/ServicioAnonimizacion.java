@@ -12,5 +12,5 @@ public class ServicioAnonimizacion {
     private final RepositorioCita citas; private final PropiedadesAplicacion propiedades;
     public ServicioAnonimizacion(RepositorioCita c,PropiedadesAplicacion p){citas=c;propiedades=p;}
     @Transactional public int anonimizarAntiguas(){int total=0;for(Cita c:citas.buscarParaAnonimizar(LocalDateTime.now().minusMonths(propiedades.getPrivacidad().getMesesConservacionDatosClientes()))){anonimizar(c);total++;}return total;}
-    public void anonimizar(Cita c){c.setNombreCliente("ANONIMIZADO");c.setTelefonoCliente("ANONIMIZADO");c.setCorreoCliente(null);c.setNotaCliente(null);c.setCodigoCancelacionHmac(null);c.setAnonimizada(true);}
+    public void anonimizar(Cita c){c.setNombreCliente("ANONIMIZADO");c.setTelefonoCliente("ANONIMIZADO");c.setNotaCliente(null);c.setCodigoCancelacionHmac(null);c.setAnonimizada(true);}
 }

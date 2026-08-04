@@ -1,0 +1,11 @@
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import './estilos/variables.css';
+import './estilos/global.css';
+import './estilos/formularios.css';
+import './estilos/tablas.css';
+import './estilos/panel.css';
+import { aplicarTema, obtenerTemaInicial } from './utilidades/tema';
+aplicarTema(obtenerTemaInicial());
+createRoot(document.getElementById('root')).render(<StrictMode><App /></StrictMode>);

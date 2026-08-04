@@ -3,8 +3,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 public record SolicitudCrearCita(
  @NotBlank @Size(max=100) String nombreCliente,
- @NotBlank @Pattern(regexp="^[0-9+ ]{7,20}$") String telefonoCliente,
- @Email @Size(max=150) String correoCliente,
+ @NotBlank @Pattern(regexp="^[0-9]{9}$", message="El móvil debe tener exactamente 9 cifras.") String telefonoCliente,
  @NotNull @Positive Long servicioId,
  @NotNull @Positive Long profesionalId,
  @NotNull @Future LocalDateTime fechaInicio,

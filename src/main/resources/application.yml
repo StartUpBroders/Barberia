@@ -6,6 +6,12 @@ spring:
     username: ${BD_USUARIO}
     password: ${BD_CONTRASENA}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 5000
+      validation-timeout: 3000
+      maximum-pool-size: 3
+      minimum-idle: 1
+      idle-timeout: 60000
   jpa:
     hibernate:
       ddl-auto: validate
@@ -42,8 +48,11 @@ aplicacion:
   autenticacion:
     maximo-intentos: 5
     bloqueo-minutos: 15
-  disponibilidad:
-    intervalo-minutos: 15
+  reservas-publicas:
+    turnstile-secreto: ${TURNSTILE_SECRET_KEY:}
+    maximo-intentos: 3
+    ventana-minutos: 5
+    maximo-citas-futuras-por-telefono: 2
   privacidad:
     meses-conservacion-datos-clientes: 24
   cors:

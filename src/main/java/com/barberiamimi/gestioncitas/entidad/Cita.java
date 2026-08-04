@@ -5,6 +5,7 @@ import com.barberiamimi.gestioncitas.enumeracion.EstadoCita;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Duration;
 
 @Entity
 @Table(name = "citas", uniqueConstraints = @UniqueConstraint(name = "uq_cita_idempotencia_barberia", columnNames = {"barberia_id", "clave_idempotencia"}))
@@ -17,7 +18,6 @@ public class Cita extends EntidadAuditable {
     private String nombreCliente;
     
     @Column(name="telefono_cliente", nullable=false, length=20) private String telefonoCliente;
-    @Column(name="correo_cliente", length=150) private String correoCliente;
     @Column(name="fecha_inicio", nullable=false) private LocalDateTime fechaInicio;
     @Column(name="fecha_fin", nullable=false) private LocalDateTime fechaFin;
     @Column(name="nota_cliente", length=1000) private String notaCliente;
@@ -33,17 +33,16 @@ public class Cita extends EntidadAuditable {
     @Column(name="huella_solicitud", nullable=false, length=64) private String huellaSolicitud;
     @Column(nullable=false) private boolean anonimizada;
     protected Cita() {}
-    public Cita(Barberia b, Profesional p, Servicio s, String nombre, String telefono, String correo,
+    public Cita(Barberia b, Profesional p, Servicio s, String nombre, String telefono,
                 LocalDateTime inicio, LocalDateTime fin, String nota, String hmac, String clave, String huella) {
-        barberia=b; profesional=p; servicio=s; nombreCliente=nombre; telefonoCliente=telefono; correoCliente=correo;
+        barberia=b; profesional=p; servicio=s; nombreCliente=nombre; telefonoCliente=telefono;
         fechaInicio=inicio; fechaFin=fin; notaCliente=nota; codigoCancelacionHmac=hmac; claveIdempotencia=clave;
         huellaSolicitud=huella; estado=EstadoCita.CONFIRMADA; nombreServicioReservado=s.getNombre();
-        precioServicioReservado=s.getPrecio(); duracionServicioMinutosReservada=s.getDuracionMinutos();
+        precioServicioReservado=s.getPrecio(); duracionServicioMinutosReservada=(int)Duration.between(inicio,fin).toMinutes();
     }
     public Long getId(){return id;} public Barberia getBarberia(){return barberia;} public Profesional getProfesional(){return profesional;} public Servicio getServicio(){return servicio;}
     public String getNombreCliente(){return nombreCliente;} public void setNombreCliente(String v){nombreCliente=v;}
     public String getTelefonoCliente(){return telefonoCliente;} public void setTelefonoCliente(String v){telefonoCliente=v;}
-    public String getCorreoCliente(){return correoCliente;} public void setCorreoCliente(String v){correoCliente=v;}
     public LocalDateTime getFechaInicio(){return fechaInicio;} public void setFechaInicio(LocalDateTime v){fechaInicio=v;}
     public LocalDateTime getFechaFin(){return fechaFin;} public void setFechaFin(LocalDateTime v){fechaFin=v;}
     public String getNotaCliente(){return notaCliente;} public void setNotaCliente(String v){notaCliente=v;}
@@ -57,5 +56,5 @@ public class Cita extends EntidadAuditable {
     public String getClaveIdempotencia(){return claveIdempotencia;} public String getHuellaSolicitud(){return huellaSolicitud;}
     public boolean isAnonimizada(){return anonimizada;} public void setAnonimizada(boolean v){anonimizada=v;}
     public boolean estaActiva(){return estado==EstadoCita.RESERVADA || estado==EstadoCita.CONFIRMADA;}
-    public void actualizarReserva(Profesional p,Servicio s,String nombre,String telefono,String correo,LocalDateTime inicio,LocalDateTime fin,String nota){profesional=p;servicio=s;nombreCliente=nombre;telefonoCliente=telefono;correoCliente=correo;fechaInicio=inicio;fechaFin=fin;notaCliente=nota;nombreServicioReservado=s.getNombre();precioServicioReservado=s.getPrecio();duracionServicioMinutosReservada=s.getDuracionMinutos();}
+    public void actualizarReserva(Profesional p,Servicio s,String nombre,String telefono,LocalDateTime inicio,LocalDateTime fin,String nota){profesional=p;servicio=s;nombreCliente=nombre;telefonoCliente=telefono;fechaInicio=inicio;fechaFin=fin;notaCliente=nota;nombreServicioReservado=s.getNombre();precioServicioReservado=s.getPrecio();duracionServicioMinutosReservada=(int)Duration.between(inicio,fin).toMinutes();}
 }

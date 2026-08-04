@@ -1,0 +1,91 @@
+.seccion-formulario { max-width: 900px; }
+.encabezado-pagina { margin-bottom: 28px; display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+.encabezado-pagina h1 { margin: 6px 0 8px; font-size: clamp(2.2rem, 5vw, 3.6rem); }
+.encabezado-pagina p { margin-bottom: 0; color: var(--color-texto-suave); }
+form { display: grid; gap: 22px; }
+fieldset { margin: 0; padding: 25px; border: 1px solid var(--color-borde); border-radius: var(--radio-borde); background: var(--color-superficie); }
+legend { padding: 0 9px; color: var(--color-primario); font-weight: 800; }
+.rejilla-formulario, .formulario-rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.formulario-rejilla > h2, .formulario-rejilla > .grupo-botones { grid-column: 1 / -1; }
+label { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-content: start; column-gap: 4px; row-gap: 7px; font-weight: 700; }
+label > input, label > select, label > textarea, label > .campo-error { grid-column: 1 / -1; }
+label > span[aria-hidden="true"] { color: var(--color-primario); }
+.etiqueta-campo { grid-column: 1 / -1; display: inline-flex; align-items: baseline; gap: 4px; justify-self: start; white-space: nowrap; }
+.etiqueta-campo > span[aria-hidden="true"] { color: var(--color-primario); }
+label small { color: var(--color-texto-suave); font-weight: 400; }
+input, select, textarea { width: 100%; min-height: 45px; padding: 10px 12px; border: 1px solid var(--color-borde); border-radius: 9px; background: #0c0c10; color: var(--color-texto); }
+textarea { resize: vertical; min-height: 90px; }
+input:focus, select:focus, textarea:focus { border-color: var(--color-primario); }
+.campo-ancho { grid-column: 1 / -1; }
+.campo-error { color: var(--color-error); font-size: .83rem; font-weight: 650; }
+.selector-horarios { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+.selector-horarios button { padding: 11px; border: 1px solid #237c55; border-radius: 9px; background: #102d20; color: #72e3ab; }
+.selector-horarios button.seleccionado { background: var(--color-primario); color: white; }
+.dias-reserva { display: flex; gap: 10px; padding: 6px 3px 14px; overflow-x: auto; scroll-snap-type: x proximity; }
+.dias-reserva button { flex: 0 0 92px; min-height: 112px; padding: 11px 7px; display: grid; place-items: center; scroll-snap-align: start; border: 1px solid var(--color-borde); border-radius: 13px; background: #18181d; color: var(--color-texto); }
+.dias-reserva button span { font-size: .75rem; font-weight: 800; text-transform: uppercase; }
+.dias-reserva button strong { font: 2rem Georgia, serif; }
+.dias-reserva button small { color: var(--color-exito); }
+.dias-reserva button.disponible:not(.seleccionado) { border-color: #267c55; color: var(--color-exito); }
+.dias-reserva button.seleccionado { border-color: #ff3858; background: linear-gradient(155deg, #ee1b3c, #a9001d); color: white; box-shadow: 0 8px 24px rgb(227 24 55 / 30%); }
+.dias-reserva button.seleccionado small { color: #ffe0e5; }
+.dias-reserva button.no-disponible { background: #101014; color: #6f6f77; opacity: .72; }
+.dias-reserva button.no-disponible small { color: #858981; }
+.leyenda-calendario { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 5px 0 0; color: var(--color-texto-suave); font-size: .8rem; }
+.punto { width: 8px; height: 8px; display: inline-block; border-radius: 50%; }
+.punto.disponible { background: var(--color-exito); }
+.punto.completo, .punto.descanso { background: var(--color-error); }
+.punto.citas { background: var(--color-secundario); }
+.titulo-dia-seleccionado { margin-bottom: 16px; font-size: 1.3rem; text-transform: capitalize; }
+.selector-horarios-tarjetas { grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); }
+.selector-horarios-tarjetas button { min-height: 68px; display: grid; gap: 2px; }
+.selector-horarios-tarjetas button strong { font-size: 1.15rem; }
+.selector-horarios-tarjetas button span { font-size: .72rem; opacity: .75; }
+.ayuda-campo { color: var(--color-texto-suave); }
+.opcion-linea { display: flex; align-items: center; gap: 9px; font-weight: 650; }
+.opcion-linea input { width: 18px; min-height: 18px; }
+.filtros { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 15px; align-items: end; margin-bottom: 22px; }
+.pagina-login { min-height: 100vh; padding: 24px; display: grid; place-items: center; background: radial-gradient(circle at 50% 0%, rgb(227 24 55 / 15%), transparent 32rem), #08080a; }
+.tarjeta-login { width: min(100%, 480px); padding: clamp(28px, 5vw, 46px); border: 1px solid var(--color-borde); border-radius: var(--radio-borde); background: var(--color-superficie); box-shadow: var(--sombra-tarjeta); }
+.tarjeta-login h1 { margin: 10px 0 32px; font-size: clamp(2.4rem, 8vw, 4rem); }
+.tarjeta-login .enlace-flecha { display: inline-block; margin-top: 28px; }
+.confirmacion { text-align: center; }
+.confirmacion-icono { width: 70px; height: 70px; margin: auto auto 20px; display: grid; place-items: center; border-radius: 50%; background: var(--color-primario); color: white; font-size: 2rem; }
+.resumen-reserva { display: grid; grid-template-columns: repeat(2, 1fr); text-align: left; border-top: 1px solid var(--color-borde); }
+.resumen-reserva div { padding: 15px; border-bottom: 1px solid var(--color-borde); }
+.resumen-reserva dt { color: var(--color-texto-suave); font-size: .75rem; text-transform: uppercase; }
+.resumen-reserva dd { margin: 2px 0; font-weight: 750; }
+.codigo-cancelacion { margin: 28px 0; padding: 25px; display: grid; gap: 12px; justify-items: center; border: 1px solid #8c6210; border-radius: var(--radio-borde); background: #271d09; }
+.codigo-cancelacion strong { font: 3rem/1 monospace; letter-spacing: .18em; }
+.reserva-moderna { max-width: 1120px; }
+.formulario-reserva-abierto { grid-template-columns: 1fr; align-items: start; }
+.formulario-reserva-abierto fieldset { height: 100%; }
+.comprobacion-turnstile { grid-column: 1 / -1; min-height: 0; display: grid; justify-items: center; }
+.comprobacion-turnstile:empty { display: none; }
+.comprobacion-turnstile .campo-error { text-align: center; }
+.bloque-ancho-reserva { grid-column: 1 / -1; }
+.telefono-destacado { color: #ff8597; }
+.telefono-destacado input { border-color: #9c2639; box-shadow: inset 4px 0 var(--color-primario); }
+.navegacion-reserva { margin-bottom: 14px; display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; gap: 12px; align-items: center; }
+.navegacion-reserva strong { text-align: center; text-transform: capitalize; }
+.navegacion-reserva button { width: 42px; height: 42px; border: 1px solid #7c2331; border-radius: 50%; background: #221017; color: #ff8194; font-size: 1.65rem; line-height: 1; }
+.navegacion-reserva button:disabled { border-color: var(--color-borde); background: #101014; color: #55555d; cursor: default; }
+.semana-reserva { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); overflow: visible; }
+.semana-reserva button { min-width: 0; width: 100%; min-height: 108px; }
+.horas-reserva { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+:root[data-tema='claro'] input, :root[data-tema='claro'] select, :root[data-tema='claro'] textarea { background: #fff; }
+:root[data-tema='claro'] .selector-horarios button { background: #e5f7ed; color: #087a46; }
+:root[data-tema='claro'] .selector-horarios button.seleccionado { background: var(--color-primario); color: white; }
+:root[data-tema='claro'] .dias-reserva button { background: #fff; }
+:root[data-tema='claro'] .dias-reserva button.seleccionado { border-color: #d30f30; background: linear-gradient(155deg, #ee1b3c, #a9001d); color: #fff; }
+:root[data-tema='claro'] .dias-reserva button.seleccionado small { color: #ffe0e5; }
+:root[data-tema='claro'] .dias-reserva button.no-disponible { background: #ececef; color: #86868e; }
+:root[data-tema='claro'] .pagina-login { background: radial-gradient(circle at 50% 0%, rgb(207 18 48 / 9%), transparent 32rem), #f5f5f7; }
+:root[data-tema='claro'] .codigo-cancelacion { background: #fff5da; }
+:root[data-tema='claro'] .navegacion-reserva button { background: #fff0f3; color: #bd1731; }
+:root[data-tema='claro'] .navegacion-reserva button:disabled { background: #eeeeF1; color: #9a9aa1; }
+.cabecera-login { margin-bottom: 40px; display: flex; justify-content: flex-end; }
+@media (max-width: 760px) { .formulario-reserva-abierto { grid-template-columns: 1fr; } .bloque-ancho-reserva { grid-column: auto; } .semana-reserva button { padding-inline: 4px; } }
+@media (max-width: 520px) { .reserva-moderna { padding-inline: 10px; } .formulario-reserva-abierto fieldset { padding: 16px 9px; } .semana-reserva { grid-template-columns: repeat(7, minmax(0, 1fr)); overflow: visible; gap: 3px; padding-inline: 0; } .semana-reserva button { min-height: 74px; padding: 6px 1px; border-radius: 9px; font-size: .7rem; } .semana-reserva button span { font-size: .58rem; } .semana-reserva button strong { font-size: 1.35rem; } .semana-reserva button small { font-size: 0; } .semana-reserva button small::after { content: '●'; font-size: .55rem; color: var(--color-exito); } .semana-reserva button.no-disponible small::after { color: #74747c; } .horas-reserva { grid-template-columns: repeat(2, minmax(0, 1fr)); } .navegacion-reserva { grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 5px; } .navegacion-reserva button { width: 36px; height: 36px; } .navegacion-reserva strong { font-size: .72rem; } .leyenda-calendario { font-size: .72rem; } }
+@media (max-width: 680px) { .rejilla-formulario, .formulario-rejilla, .filtros { grid-template-columns: 1fr; } .campo-ancho, .formulario-rejilla > h2, .formulario-rejilla > .grupo-botones { grid-column: auto; } .encabezado-pagina { align-items: start; flex-direction: column; } }
+@media (max-width: 520px) { .pagina-login { padding: 12px; } .tarjeta-login { padding: 28px 20px; } }

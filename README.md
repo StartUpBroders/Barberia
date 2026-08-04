@@ -57,7 +57,10 @@ Las respuestas usan DTOs; las entidades JPA no se exponen. PostgreSQL impone la 
 
 - Catálogo público de barbería, servicios y profesionales activos.
 - Disponibilidad calculada con jornada, duración, bloqueos y citas activas.
+- Bloqueos parciales transaccionales: cierran el tramo, cancelan las citas solapadas sin borrar su historial y generan avisos de contacto.
+- Calendario de reserva con cadencia y antelación configurables, rutina semanal y aperturas excepcionales por fecha.
 - Reserva transaccional con fotografía histórica del servicio e idempotencia.
+- Turnstile validado por el backend, límite de tres intentos de reserva por IP cada cinco minutos y máximo de dos citas futuras confirmadas por teléfono.
 - Restricción PostgreSQL contra solapamientos, incluidos los parciales.
 - Código de cancelación de cinco cifras generado con `SecureRandom` y almacenado como HMAC-SHA256.
 - Cancelación pública con respuesta genérica, límite persistente de intentos y plazo mínimo de 24 horas.
@@ -80,9 +83,13 @@ No se usa Docker, Testcontainers, H2, Flyway, Liquibase ni el SDK de Supabase.
 
 1. Crear los proyectos separados de Supabase para desarrollo, pruebas y producción.
 2. Ejecutar manualmente [01_esquema_inicial.sql](documentacion/sql/01_esquema_inicial.sql) desde el editor SQL de cada entorno nuevo.
+   Si la base ya existía antes del calendario avanzado, ejecutar además [02_calendario_avanzado.sql](documentacion/sql/02_calendario_avanzado.sql).
+   Para una base existente, ejecutar también [04_proteccion_reservas.sql](documentacion/sql/04_proteccion_reservas.sql).
+   Para retirar los campos antiguos de contacto, ejecutar [05_eliminar_correo.sql](documentacion/sql/05_eliminar_correo.sql).
 3. Copiar los nombres de `.env.example` al gestor de variables del sistema o del IDE. La aplicación no carga archivos `.env` por sí sola.
 4. Definir un `SECRETO_HMAC_CANCELACION` aleatorio de al menos 32 caracteres y distinto por entorno.
-5. En producción, definir `COOKIE_SEGURA=true`, servir exclusivamente mediante HTTPS y limitar CORS al origen real del frontend.
+5. Crear un widget administrado de Cloudflare Turnstile y configurar su clave secreta como `TURNSTILE_SECRET_KEY`. El frontend debe usar la clave pública correspondiente en `VITE_TURNSTILE_SITE_KEY`.
+6. En producción, definir `COOKIE_SEGURA=true`, servir exclusivamente mediante HTTPS y limitar CORS al origen real del frontend.
 
 Variables obligatorias de ejecución:
 
@@ -91,6 +98,7 @@ BD_URL
 BD_USUARIO
 BD_CONTRASENA
 SECRETO_HMAC_CANCELACION
+TURNSTILE_SECRET_KEY
 ```
 
 Variables exclusivas de pruebas de integración:
@@ -143,12 +151,10 @@ El informe se genera en `target/site/jacoco/index.html`. Para activar la prueba 
 
 ## Privacidad y conservación
 
-`ServicioAnonimizacion.anonimizarAntiguas()` anonimiza nombre, teléfono, correo, nota y HMAC de citas anteriores al período configurable `aplicacion.privacidad.meses-conservacion-datos-clientes`. Se conserva la fecha, el profesional, el estado y la fotografía del servicio para estadísticas. En esta versión se invoca manualmente desde una consola administrativa o una futura tarea programada; no se expone como endpoint para evitar ejecuciones accidentales.
+`ServicioAnonimizacion.anonimizarAntiguas()` anonimiza nombre, teléfono, nota y HMAC de citas anteriores al período configurable `aplicacion.privacidad.meses-conservacion-datos-clientes`. Se conserva la fecha, el profesional, el estado y la fotografía del servicio para estadísticas. En esta versión se invoca manualmente desde una consola administrativa o una futura tarea programada; no se expone como endpoint para evitar ejecuciones accidentales.
 
 ## Limitaciones actuales
 
-- No existe frontend.
-- No se envían correos, SMS ni mensajes de WhatsApp.
-- La limitación de reservas públicas distintas de la cancelación debe complementarse con límites en el proxy de entrada.
-- La limpieza de intentos antiguos y la anonimización no están programadas automáticamente.
+- No se envían SMS ni mensajes de WhatsApp.
+- La anonimización histórica no está programada automáticamente.
 - Solo Barbería Mimi se incluye como dato inicial de desarrollo.
