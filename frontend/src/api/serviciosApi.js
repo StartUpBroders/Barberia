@@ -4,3 +4,4 @@ export const listarServicios = () => peticion('/api/administracion/servicios');
 export const crearServicio = (datos) => peticion('/api/administracion/servicios', { method: 'POST', body: datos });
 export const actualizarServicio = (id, datos) => peticion(`/api/administracion/servicios/${id}`, { method: 'PUT', body: datos });
 export const cambiarEstadoServicio = (id, activo) => peticion(`/api/administracion/servicios/${id}/estado`, { method: 'PATCH', body: { activo } });
+export const eliminarServicio = (id) => peticion(`/api/administracion/servicios/${id}`, { method: 'DELETE' });

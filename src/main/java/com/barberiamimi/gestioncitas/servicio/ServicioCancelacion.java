@@ -17,8 +17,8 @@ import java.util.Locale;
 
 @Service
 public class ServicioCancelacion {
-    private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-ES"));
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
+    private static final Locale IDIOMA = Locale.forLanguageTag("es-ES");
     private final ServicioCatalogoPublico catalogo; private final RepositorioCita citas; private final RepositorioNotificacion notificaciones;
     private final RepositorioIntentoCancelacion intentos; private final UtilidadCriptografica criptografia; private final PropiedadesAplicacion propiedades;
     public ServicioCancelacion(ServicioCatalogoPublico ca,RepositorioCita c,RepositorioNotificacion n,RepositorioIntentoCancelacion i,UtilidadCriptografica u,PropiedadesAplicacion p){catalogo=ca;citas=c;notificaciones=n;intentos=i;criptografia=u;propiedades=p;}
@@ -35,8 +35,9 @@ public class ServicioCancelacion {
         if(encontrada.getFechaInicio().isBefore(LocalDateTime.now().plusHours(propiedades.getCancelacion().getHorasLimite())))throw new CancelacionNoPermitidaExcepcion("La cita ya no puede cancelarse desde la web. Ponte en contacto con la barbería.");
         encontrada.setEstado(EstadoCita.CANCELADA_POR_CLIENTE); encontrada.setCanceladaPor(CanceladaPor.CLIENTE); encontrada.setFechaCancelacion(LocalDateTime.now()); encontrada.setCodigoCancelacionHmac(null); citas.save(encontrada); intentos.save(new IntentoCancelacion(b,huella,true));
         String titulo=encontrada.getNombreCliente()+" canceló su cita";
-        String mensaje="La cita del "+encontrada.getFechaInicio().format(FORMATO_FECHA)+", de "+encontrada.getFechaInicio().format(FORMATO_HORA)+" a "+encontrada.getFechaFin().format(FORMATO_HORA)+", con "+encontrada.getProfesional().getNombre()+" para "+encontrada.getNombreServicioReservado()+" ha sido cancelada. Ese horario vuelve a estar disponible.";
+        String mensaje="El cliente "+encontrada.getNombreCliente()+" con número "+encontrada.getTelefonoCliente()+" canceló su cita para el "+fechaConMes(encontrada.getFechaInicio())+" a las "+encontrada.getFechaInicio().format(FORMATO_HORA)+". El tramo de "+encontrada.getFechaInicio().format(FORMATO_HORA)+" a "+encontrada.getFechaFin().format(FORMATO_HORA)+" ha quedado disponible.";
         notificaciones.save(new Notificacion(b,encontrada.getProfesional(),encontrada,TipoNotificacion.CITA_CANCELADA,titulo,mensaje));
         return new MensajeRespuesta("CITA_CANCELADA","La cita se ha cancelado correctamente.");
     }
+    private static String fechaConMes(LocalDateTime fecha){String mes=fecha.format(DateTimeFormatter.ofPattern("MMMM",IDIOMA));return fecha.getDayOfMonth()+" de "+mes.substring(0,1).toUpperCase(IDIOMA)+mes.substring(1);}
 }

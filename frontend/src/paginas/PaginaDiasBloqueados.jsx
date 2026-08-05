@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   crearBloqueosParciales,
   eliminarDiaBloqueado,
   listarDiasBloqueados,
 } from "../api/diasBloqueadosApi";
-import { listarProfesionales } from "../api/profesionalesApi";
 import { listarHorarios } from "../api/horariosApi";
 import { listarDiasTrabajoEspecial } from "../api/diasTrabajoEspecialApi";
 import { consultarConfiguracionReservas } from "../api/configuracionReservasApi";
@@ -43,7 +42,6 @@ const solapa = (inicioA, finA, inicioB, finB) =>
 
 export function PaginaDiasBloqueados() {
   const { sesion } = usarAutenticacion();
-  const esPropietario = sesion?.rol === "PROPIETARIO";
   const profesionalPropioId = sesion?.profesional?.id;
   const [datos, setDatos] = useState(null);
   const [profesionalId, setProfesionalId] = useState("");
@@ -56,46 +54,43 @@ export function PaginaDiasBloqueados() {
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
 
-  const cargar = async () => {
+  const cargar = useCallback(async () => {
     setCargando(true);
     setError("");
     try {
       const [
         bloqueos,
-        profesionales,
         horarios,
         especiales,
         citas,
         configuracion,
       ] = await Promise.all([
         listarDiasBloqueados(),
-        listarProfesionales(),
         listarHorarios(),
         listarDiasTrabajoEspecial(),
         listarCitas(),
         consultarConfiguracionReservas(),
       ]);
-      const profesionalesGestionables = esPropietario ? profesionales : profesionales.filter((persona) => persona.id === profesionalPropioId);
       setDatos({
         bloqueos,
-        profesionales: profesionalesGestionables,
+        profesionales: sesion?.profesional ? [sesion.profesional] : [],
         horarios,
         especiales,
         citas,
         configuracion,
       });
       setProfesionalId(
-        (actual) => actual || String(profesionalesGestionables[0]?.id || ""),
+        (actual) => actual || String(profesionalPropioId || ""),
       );
     } catch (fallo) {
       setError(fallo.mensaje || fallo.message);
     } finally {
       setCargando(false);
     }
-  };
+  }, [profesionalPropioId, sesion?.profesional]);
   useEffect(() => {
     cargar();
-  }, []);
+  }, [cargar]);
 
   const calendario = useMemo(() => {
     if (!datos || !profesionalId) return [];
@@ -230,6 +225,7 @@ export function PaginaDiasBloqueados() {
         motivo: motivo.trim() || null,
       });
       setResultado(respuesta);
+      if (respuesta.citasAfectadas?.length > 0) window.dispatchEvent(new CustomEvent("notificaciones-actualizadas"));
       setMensaje(respuesta.mensaje);
       setTramosSeleccionados([]);
       setMotivo("");
@@ -268,24 +264,6 @@ export function PaginaDiasBloqueados() {
             cancelarán y quedarán registradas para avisar al cliente.
           </p>
         </div>
-        <label>
-          Profesional
-          <select
-            value={profesionalId}
-            onChange={(e) => {
-              setProfesionalId(e.target.value);
-              setFechaSeleccionada("");
-              setTramosSeleccionados([]);
-            }}
-          >
-            <option value="">Selecciona</option>
-            {datos?.profesionales.map((persona) => (
-              <option key={persona.id} value={persona.id}>
-                {persona.nombre}
-              </option>
-            ))}
-          </select>
-        </label>
       </div>
       <MensajeEstado tipo="error">{error}</MensajeEstado>
       <MensajeEstado tipo="exito">{mensaje}</MensajeEstado>

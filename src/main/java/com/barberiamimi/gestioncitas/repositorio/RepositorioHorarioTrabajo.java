@@ -8,4 +8,5 @@ public interface RepositorioHorarioTrabajo extends JpaRepository<HorarioTrabajo,
     List<HorarioTrabajo> findByBarberiaIdAndProfesionalIdAndActivoTrueOrderByDiaSemanaAscHoraInicioAsc(Long barberiaId, Long profesionalId);
     List<HorarioTrabajo> findByBarberiaIdOrderByDiaSemanaAscHoraInicioAsc(Long barberiaId);
     Optional<HorarioTrabajo> findByIdAndBarberiaId(Long id, Long barberiaId);
+    void deleteByBarberiaIdAndProfesionalId(Long barberiaId, Long profesionalId);
 }

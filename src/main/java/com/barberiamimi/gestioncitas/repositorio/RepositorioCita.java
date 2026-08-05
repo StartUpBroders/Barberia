@@ -11,6 +11,9 @@ public interface RepositorioCita extends JpaRepository<Cita, Long> {
     List<Cita> findByBarberiaIdOrderByFechaInicioDesc(Long barberiaId);
     List<Cita> findByBarberiaIdAndProfesionalIdOrderByFechaInicioDesc(Long barberiaId, Long profesionalId);
     List<Cita> findByBarberiaIdAndEstadoOrderByFechaInicioAsc(Long barberiaId, EstadoCita estado);
+    List<Cita> findByBarberiaIdAndEstadoInOrderByFechaInicioAsc(Long barberiaId, Collection<EstadoCita> estados);
+    void deleteByBarberiaIdAndProfesionalId(Long barberiaId, Long profesionalId);
+    boolean existsByBarberiaIdAndServicioId(Long barberiaId, Long servicioId);
     List<Cita> findByBarberiaIdAndTelefonoClienteAndEstadoInAndAnonimizadaFalse(Long barberiaId, String telefono, Collection<EstadoCita> estados);
     @Query("select count(c) from Cita c where c.barberia.id=:barberiaId and replace(c.telefonoCliente, ' ', '')=:telefono and c.estado=:estado and c.fechaInicio>:fecha")
     long countByBarberiaIdAndTelefonoClienteAndEstadoAndFechaInicioAfter(@Param("barberiaId") Long barberiaId, @Param("telefono") String telefono, @Param("estado") EstadoCita estado, @Param("fecha") LocalDateTime fecha);

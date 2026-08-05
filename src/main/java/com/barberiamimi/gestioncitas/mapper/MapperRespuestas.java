@@ -12,5 +12,5 @@ public class MapperRespuestas {
     public HorarioRespuesta horario(HorarioTrabajo h){return new HorarioRespuesta(h.getId(),h.getProfesional().getId(),h.getDiaSemana(),h.getHoraInicio(),h.getHoraFin(),h.isActivo());}
     public DiaBloqueadoRespuesta diaBloqueado(DiaBloqueado d){return new DiaBloqueadoRespuesta(d.getId(),d.getProfesional().getId(),d.getFecha(),d.getHoraInicio(),d.getHoraFin(),d.getMotivo());}
     public DiaTrabajoEspecialRespuesta diaTrabajoEspecial(DiaTrabajoEspecial d){return new DiaTrabajoEspecialRespuesta(d.getId(),d.getProfesional().getId(),d.getFecha(),d.getHoraInicio(),d.getHoraFin());}
-    public NotificacionRespuesta notificacion(Notificacion n){return new NotificacionRespuesta(n.getId(),n.getTipo(),n.getTitulo(),n.getMensaje(),n.isLeida(),n.getCita()==null?null:n.getCita().getId(),n.getFechaCreacion(),n.getFechaLectura());}
+    public NotificacionRespuesta notificacion(Notificacion n){Cita c=n.getCita();return new NotificacionRespuesta(n.getId(),n.getTipo(),n.getTitulo(),n.getMensaje(),n.isLeida(),c==null?null:c.getId(),n.getFechaCreacion(),n.getFechaLectura(),c==null?null:c.getCanceladaPor(),c==null?null:c.getNombreCliente(),c==null?null:c.getTelefonoCliente(),c==null?null:c.getFechaInicio(),c==null?null:c.getFechaFin());}
 }

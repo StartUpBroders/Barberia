@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { actualizarProfesional, cambiarEstadoProfesional, crearProfesional, listarProfesionales } from '../api/profesionalesApi';
+import { actualizarProfesional, cambiarEstadoProfesional, crearProfesional, eliminarProfesional, listarProfesionales } from '../api/profesionalesApi';
 import { EstadoCarga } from '../componentes/comunes/EstadoCarga';
 import { EstadoVacio } from '../componentes/comunes/EstadoVacio';
 import { MensajeEstado } from '../componentes/comunes/MensajeEstado';
@@ -15,6 +15,7 @@ export function PaginaProfesionales() {
   const [mensaje, setMensaje] = useState('');
   const profesionalEditado = lista.find((persona) => persona.id === editando);
   const necesitaCrearAcceso = Boolean(editando && !profesionalEditado?.nombreUsuario);
+  const notificarEquipo = () => window.dispatchEvent(new CustomEvent('equipo-actualizado'));
 
   const cargar = async () => {
     setCargando(true);
@@ -44,6 +45,7 @@ export function PaginaProfesionales() {
       setFormulario(inicial);
       setEditando(null);
       await cargar();
+      notificarEquipo();
     } catch (fallo) { setError(fallo.mensaje || fallo.message); }
   };
   const editar = (persona) => {
@@ -54,7 +56,13 @@ export function PaginaProfesionales() {
   };
   const alternar = async (persona) => {
     if (!window.confirm(`¿${persona.activo ? 'Desactivar' : 'Activar'} a ${persona.nombre}?`)) return;
-    try { await cambiarEstadoProfesional(persona.id, !persona.activo); await cargar(); }
+    try { await cambiarEstadoProfesional(persona.id, !persona.activo); await cargar(); notificarEquipo(); setMensaje(persona.activo ? `${persona.nombre} ha quedado deshabilitado.` : `${persona.nombre} vuelve a estar activo.`); }
+    catch (fallo) { setError(fallo.mensaje || fallo.message); }
+  };
+  const eliminar = async (persona) => {
+    if (!window.confirm(`¿Eliminar definitivamente a ${persona.nombre}? Se borrarán sus citas, horarios, calendario, notificaciones y acceso. Esta acción no se puede deshacer.`)) return;
+    setError(''); setMensaje('');
+    try { await eliminarProfesional(persona.id); if (editando === persona.id) cancelarEdicion(); await cargar(); notificarEquipo(); setMensaje(`${persona.nombre} y todos sus datos relacionados se han eliminado.`); }
     catch (fallo) { setError(fallo.mensaje || fallo.message); }
   };
 
@@ -70,6 +78,6 @@ export function PaginaProfesionales() {
       <p className="ayuda-campo campo-ancho">El acceso se crea como empleado de esta barbería. Podrá gestionar su agenda y consultar el calendario del equipo.</p>
       <div className="grupo-botones"><button className="boton">{editando ? 'Guardar cambios' : 'Crear profesional y acceso'}</button>{editando && <button type="button" onClick={cancelarEdicion}>Cancelar</button>}</div>
     </form>
-    {cargando ? <EstadoCarga /> : lista.length === 0 ? <EstadoVacio titulo="Sin profesionales" texto="Añade el primer miembro del equipo." /> : <div className="rejilla-tarjetas">{lista.map((persona) => <article className={`tarjeta tarjeta-gestion ${!persona.activo ? 'inactivo' : ''}`} key={persona.id}><span className="avatar" aria-hidden="true">{persona.nombre.charAt(0)}</span><div><span className="etiqueta">{persona.activo ? 'Activo' : 'Inactivo'}</span><h2>{persona.nombre}</h2><p>{persona.alias || 'Sin alias'}</p><small>{persona.nombreUsuario ? `Acceso: ${persona.nombreUsuario} · ${persona.rol === 'PROPIETARIO' ? 'Propietario' : 'Empleado'}` : 'Sin acceso al panel'}</small></div><div className="grupo-botones"><button onClick={() => editar(persona)}>Editar</button><button onClick={() => alternar(persona)}>{persona.activo ? 'Desactivar' : 'Activar'}</button></div></article>)}</div>}
+    {cargando ? <EstadoCarga /> : lista.length === 0 ? <EstadoVacio titulo="Sin profesionales" texto="Añade el primer miembro del equipo." /> : <div className="rejilla-tarjetas">{lista.map((persona) => <article className={`tarjeta tarjeta-gestion ${!persona.activo ? 'inactivo' : ''}`} key={persona.id}><span className="avatar" aria-hidden="true">{persona.nombre.charAt(0)}</span><div><span className="etiqueta">{persona.activo ? 'Activo' : 'Inactivo'}</span><h2>{persona.nombre}</h2><p>{persona.alias || 'Sin alias'}</p><small>{persona.nombreUsuario ? `Acceso: ${persona.nombreUsuario} · ${persona.rol === 'PROPIETARIO' ? 'Propietario' : 'Empleado'}` : 'Sin acceso al panel'}</small></div><div className="grupo-botones"><button onClick={() => editar(persona)}>Editar</button>{persona.rol !== 'PROPIETARIO' && <><button onClick={() => alternar(persona)}>{persona.activo ? 'Deshabilitar' : 'Activar'}</button><button className="accion-peligro" onClick={() => eliminar(persona)}>Eliminar definitivamente</button></>}</div></article>)}</div>}
   </section>;
 }

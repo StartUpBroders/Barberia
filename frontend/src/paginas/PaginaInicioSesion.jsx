@@ -4,7 +4,7 @@ import { usarAutenticacion } from '../hooks/usarAutenticacion';
 import { MensajeEstado } from '../componentes/comunes/MensajeEstado';
 import { BotonTema } from '../componentes/comunes/BotonTema';
 import { mensajeError } from '../utilidades/errores';
-import { rutaBasePanel } from '../utilidades/rutasPanel';
+import { rutaInicioPanel } from '../utilidades/rutasPanel';
 
 export function PaginaInicioSesion() {
   const { autenticado, comprobando, iniciarSesion, sesion } = usarAutenticacion();
@@ -14,7 +14,7 @@ export function PaginaInicioSesion() {
   const ubicacion = useLocation();
   const navegar = useNavigate();
 
-  if (!comprobando && autenticado) return <Navigate to={rutaBasePanel(sesion)} replace />;
+  if (!comprobando && autenticado) return <Navigate to={rutaInicioPanel(sesion)} replace />;
 
   const enviar = async (evento) => {
     evento.preventDefault();
@@ -26,7 +26,7 @@ export function PaginaInicioSesion() {
     setError(null);
     try {
       const nuevaSesion = await iniciarSesion(datos);
-      navegar(ubicacion.state?.desde || rutaBasePanel(nuevaSesion), { replace: true });
+      navegar(ubicacion.state?.desde || rutaInicioPanel(nuevaSesion), { replace: true });
     } catch (fallo) {
       setError(fallo);
     } finally {

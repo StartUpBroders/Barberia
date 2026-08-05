@@ -86,7 +86,7 @@ No se usa Docker, Testcontainers, H2, Flyway, Liquibase ni el SDK de Supabase.
    Si la base ya existía antes del calendario avanzado, ejecutar además [02_calendario_avanzado.sql](documentacion/sql/02_calendario_avanzado.sql).
    Para una base existente, ejecutar también [04_proteccion_reservas.sql](documentacion/sql/04_proteccion_reservas.sql).
    Para retirar los campos antiguos de contacto, ejecutar [05_eliminar_correo.sql](documentacion/sql/05_eliminar_correo.sql).
-3. Copiar los nombres de `.env.example` al gestor de variables del sistema o del IDE. La aplicación no carga archivos `.env` por sí sola.
+3. Copiar `.env.example` como `.env` y completar sus valores. Spring carga automáticamente ese archivo al arrancar desde la raíz del proyecto.
 4. Definir un `SECRETO_HMAC_CANCELACION` aleatorio de al menos 32 caracteres y distinto por entorno.
 5. Crear un widget administrado de Cloudflare Turnstile y configurar su clave secreta como `TURNSTILE_SECRET_KEY`. El frontend debe usar la clave pública correspondiente en `VITE_TURNSTILE_SITE_KEY`.
 6. En producción, definir `COOKIE_SEGURA=true`, servir exclusivamente mediante HTTPS y limitar CORS al origen real del frontend.

@@ -11,7 +11,7 @@ public record SolicitudCrearCitaAdministrativa(
  @NotNull @Future LocalDateTime fechaInicio,
  @Size(max=1000) String notaCliente) {
     public SolicitudCrearCita normalizada() {
-        String telefono = telefonoCliente == null || telefonoCliente.isBlank() ? "000000000" : telefonoCliente;
+        String telefono = telefonoCliente == null || telefonoCliente.isBlank() ? "999999999" : telefonoCliente;
         return new SolicitudCrearCita(nombreCliente, telefono, servicioId, profesionalId, fechaInicio, notaCliente);
     }
 }

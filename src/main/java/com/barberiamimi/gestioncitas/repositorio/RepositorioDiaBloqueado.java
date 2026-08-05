@@ -8,4 +8,5 @@ public interface RepositorioDiaBloqueado extends JpaRepository<DiaBloqueado, Lon
     List<DiaBloqueado> findByBarberiaIdAndProfesionalIdAndFechaBetweenOrderByFechaAscHoraInicioAsc(Long barberiaId, Long profesionalId, LocalDate desde, LocalDate hasta);
     List<DiaBloqueado> findByBarberiaIdOrderByFechaDesc(Long barberiaId);
     Optional<DiaBloqueado> findByIdAndBarberiaId(Long id, Long barberiaId);
+    void deleteByBarberiaIdAndProfesionalId(Long barberiaId, Long profesionalId);
 }

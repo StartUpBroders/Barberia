@@ -8,4 +8,5 @@ public interface RepositorioDiaTrabajoEspecial extends JpaRepository<DiaTrabajoE
     List<DiaTrabajoEspecial> findByBarberiaIdAndProfesionalIdAndFechaBetweenOrderByFechaAscHoraInicioAsc(Long barberiaId,Long profesionalId,LocalDate desde,LocalDate hasta);
     List<DiaTrabajoEspecial> findByBarberiaIdOrderByFechaAscHoraInicioAsc(Long barberiaId);
     Optional<DiaTrabajoEspecial> findByIdAndBarberiaId(Long id,Long barberiaId);
+    void deleteByBarberiaIdAndProfesionalId(Long barberiaId,Long profesionalId);
 }

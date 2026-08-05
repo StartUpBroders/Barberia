@@ -1,6 +1,6 @@
 const etiquetas = {
   CONFIRMADA: "Confirmada",
-  COMPLETADA: "Completada",
+  COMPLETADA: "Finalizado",
   CANCELADA_POR_CLIENTE: "Cancelada por cliente",
   CANCELADA_POR_BARBERIA: "Cancelada por barbería",
   RESERVADA: "Reserva antigua",

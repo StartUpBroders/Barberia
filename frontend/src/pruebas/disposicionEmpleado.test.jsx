@@ -15,7 +15,8 @@ describe('panel de empleado', () => {
     render(<MemoryRouter initialEntries={['/barberia-mimi-dashboard/pepe']}><Routes><Route path="/barberia-mimi-dashboard/:identidad" element={<DisposicionPanel />}><Route index element={<p>Resumen de Pepe</p>} /></Route></Routes></MemoryRouter>);
     const navegacion = screen.getByRole('navigation', { name: 'Navegación administrativa' });
     expect(within(navegacion).queryByRole('link', { name: /Profesionales/ })).not.toBeInTheDocument();
-    expect(within(navegacion).getByRole('link', { name: /Resumen/ })).toHaveAttribute('href', '/barberia-mimi-dashboard/pepe');
+    expect(within(navegacion).getAllByRole('link')).toHaveLength(1);
+    expect(within(navegacion).getByRole('link', { name: /Calendario/ })).toHaveAttribute('href', '/barberia-mimi-dashboard/pepe/horarios');
     expect(screen.getByRole('link', { name: 'Abrir perfil de Pepe' })).toHaveTextContent('EMPLEADO');
   });
 });

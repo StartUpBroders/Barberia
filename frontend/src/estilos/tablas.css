@@ -8,7 +8,8 @@ tbody tr:last-child td { border-bottom: 0; }
 .acciones select { min-width: 160px; padding: 6px; min-height: 35px; }
 .acciones .accion-peligro, .accion-peligro { color: var(--color-error); }
 .insignia, .etiqueta { display: inline-flex; border-radius: 999px; padding: 4px 9px; background: #29292f; font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
-.estado-confirmada, .estado-completada { background: #103122; color: #77e4ad; }
+.estado-confirmada { background: #103122; color: #77e4ad; }
+.estado-completada { background: #162d46; color: #91caff; }
 .estado-reservada { background: #352507; color: #ffd166; }
 .estado-cancelada_por_cliente, .estado-cancelada_por_barberia, .estado-no_presentado { background: #351119; color: #ff8c9e; }
 @media (max-width: 760px) {
