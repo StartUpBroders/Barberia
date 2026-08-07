@@ -12,7 +12,7 @@ describe('cliente HTTP', () => {
     vi.stubGlobal('fetch', fetchSimulado);
     const { peticion } = await import('../api/clienteHttp');
     await expect(peticion('/api/recurso', { method: 'POST', body: { nombre: 'Mimi' } })).resolves.toEqual({ id: 8 });
-    expect(fetchSimulado).toHaveBeenNthCalledWith(2, '/api/recurso', expect.objectContaining({ credentials: 'include', method: 'POST', headers: expect.objectContaining({ 'X-XSRF-TOKEN': 'token-prueba', 'Content-Type': 'application/json' }), body: JSON.stringify({ nombre: 'Mimi' }) }));
+    expect(fetchSimulado).toHaveBeenNthCalledWith(2, 'https://barberia-zocj.onrender.com/api/recurso', expect.objectContaining({ credentials: 'include', method: 'POST', headers: expect.objectContaining({ 'X-XSRF-TOKEN': 'token-prueba', 'Content-Type': 'application/json' }), body: JSON.stringify({ nombre: 'Mimi' }) }));
   });
 
   it('renueva CSRF y reintenta una sola vez ante un 403', async () => {

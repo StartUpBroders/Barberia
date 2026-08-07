@@ -1,4 +1,4 @@
-const URL_API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const URL_API = (import.meta.env.VITE_API_URL || 'https://barberia-zocj.onrender.com').replace(/\/$/, '');
 const METODOS_ESCRITURA = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 let datosCsrf = null;
 
