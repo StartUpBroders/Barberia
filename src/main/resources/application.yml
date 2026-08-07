@@ -28,6 +28,7 @@ spring:
   session:
     timeout: 30m
 server:
+  port: ${PORT:8080}
   error:
     include-message: never
     include-stacktrace: never

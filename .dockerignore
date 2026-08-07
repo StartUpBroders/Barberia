@@ -1,0 +1,11 @@
+.git
+.gitignore
+.idea
+.vscode
+.env
+*.iml
+*.log
+hs_err_pid*
+target
+frontend
+documentacion
