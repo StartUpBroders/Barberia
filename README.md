@@ -158,3 +158,4 @@ El informe se genera en `target/site/jacoco/index.html`. Para activar la prueba 
 - No se envían SMS ni mensajes de WhatsApp.
 - La anonimización histórica no está programada automáticamente.
 - Solo Barbería Mimi se incluye como dato inicial de desarrollo.
+.
