@@ -18,13 +18,14 @@ import com.barberiamimi.gestioncitas.seguridad.FiltroUsuarioActivo;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration @EnableMethodSecurity
 public class ConfiguracionSeguridad {
     @Bean PasswordEncoder codificadorContrasenas(){return new BCryptPasswordEncoder(12);}
     @Bean AuthenticationManager gestorAutenticacion(AuthenticationConfiguration c)throws Exception{return c.getAuthenticationManager();}
-    @Bean CorsConfigurationSource fuenteCors(PropiedadesAplicacion p){CorsConfiguration c=new CorsConfiguration();c.setAllowedOrigins(p.getCors().getOrigenesPermitidos());c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));c.setAllowedHeaders(List.of("Content-Type","X-XSRF-TOKEN","Idempotency-Key","Turnstile-Token"));c.setAllowCredentials(true);UrlBasedCorsConfigurationSource f=new UrlBasedCorsConfigurationSource();f.registerCorsConfiguration("/**",c);return f;}
+    @Bean CorsConfigurationSource fuenteCors(PropiedadesAplicacion p){CorsConfiguration c=new CorsConfiguration();List<String> origenes=new ArrayList<>(p.getCors().getOrigenesPermitidos());if(!origenes.contains("https://barberia-4a998.web.app"))origenes.add("https://barberia-4a998.web.app");c.setAllowedOrigins(origenes);c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));c.setAllowedHeaders(List.of("Content-Type","X-XSRF-TOKEN","Idempotency-Key","Turnstile-Token"));c.setAllowCredentials(true);UrlBasedCorsConfigurationSource f=new UrlBasedCorsConfigurationSource();f.registerCorsConfiguration("/**",c);return f;}
     @Bean SecurityFilterChain cadena(HttpSecurity http,ObjectMapper json,FiltroUsuarioActivo filtroUsuarioActivo,@Value("${COOKIE_SEGURA:false}") boolean cookieSegura,@Value("${COOKIE_SAME_SITE:Lax}") String cookieSameSite)throws Exception{
         CookieCsrfTokenRepository csrf=CookieCsrfTokenRepository.withHttpOnlyFalse();csrf.setCookieName("XSRF-TOKEN");
         csrf.setCookieCustomizer(cookie->cookie.secure(cookieSegura).sameSite(cookieSameSite));
