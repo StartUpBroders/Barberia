@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ControladorPublico.class) @Import(ConfiguracionSeguridad.class)
 class SeguridadWebPrueba {
  @Autowired MockMvc mvc; @MockitoBean ServicioCatalogoPublico catalogo; @MockitoBean ServicioDisponibilidad disponibilidad; @MockitoBean ServicioCitas citas; @MockitoBean ServicioCancelacion cancelacion; @MockitoBean ServicioProteccionReservas proteccionReservas;
+ @Test void debePermitirCorsDesdeFirebase()throws Exception{mvc.perform(options("/api/autenticacion/sesion").header("Origin","https://barberia-4a998.web.app").header("Access-Control-Request-Method","GET")).andExpect(status().isOk()).andExpect(header().string("Access-Control-Allow-Origin","https://barberia-4a998.web.app")).andExpect(header().string("Access-Control-Allow-Credentials","true"));}
  @Test @DisplayName("Debe exigir CSRF incluso en escrituras públicas") void debeExigirCsrf()throws Exception{mvc.perform(post("/api/barberias/mimi/citas")).andExpect(status().isForbidden());}
  @Test @DisplayName("Debe permitir que una escritura pública llegue al controlador con CSRF") void debeAceptarCsrf()throws Exception{mvc.perform(post("/api/barberias/mimi/citas").with(csrf())).andExpect(status().isBadRequest());}
  @Test @DisplayName("Debe rechazar el acceso administrativo sin sesión") void debeExigirSesion()throws Exception{mvc.perform(get("/api/administracion/citas")).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.codigo").value("NO_AUTENTICADO"));}
