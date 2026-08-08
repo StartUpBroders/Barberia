@@ -4,6 +4,7 @@ import com.barberiamimi.gestioncitas.dto.respuesta.ErrorRespuesta;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -24,8 +25,9 @@ public class ConfiguracionSeguridad {
     @Bean PasswordEncoder codificadorContrasenas(){return new BCryptPasswordEncoder(12);}
     @Bean AuthenticationManager gestorAutenticacion(AuthenticationConfiguration c)throws Exception{return c.getAuthenticationManager();}
     @Bean CorsConfigurationSource fuenteCors(PropiedadesAplicacion p){CorsConfiguration c=new CorsConfiguration();c.setAllowedOrigins(p.getCors().getOrigenesPermitidos());c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));c.setAllowedHeaders(List.of("Content-Type","X-XSRF-TOKEN","Idempotency-Key","Turnstile-Token"));c.setAllowCredentials(true);UrlBasedCorsConfigurationSource f=new UrlBasedCorsConfigurationSource();f.registerCorsConfiguration("/**",c);return f;}
-    @Bean SecurityFilterChain cadena(HttpSecurity http,ObjectMapper json,FiltroUsuarioActivo filtroUsuarioActivo)throws Exception{
+    @Bean SecurityFilterChain cadena(HttpSecurity http,ObjectMapper json,FiltroUsuarioActivo filtroUsuarioActivo,@Value("${COOKIE_SEGURA:false}") boolean cookieSegura,@Value("${COOKIE_SAME_SITE:Lax}") String cookieSameSite)throws Exception{
         CookieCsrfTokenRepository csrf=CookieCsrfTokenRepository.withHttpOnlyFalse();csrf.setCookieName("XSRF-TOKEN");
+        csrf.setCookieCustomizer(cookie->cookie.secure(cookieSegura).sameSite(cookieSameSite));
         http.cors(c->{}).csrf(c->c.csrfTokenRepository(csrf))
           .authorizeHttpRequests(a->a.requestMatchers("/api/barberias/**","/api/autenticacion/iniciar-sesion","/api/autenticacion/csrf","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html").permitAll().requestMatchers("/api/administracion/**").hasAnyRole("PROPIETARIO","BARBERO").anyRequest().authenticated())
           .sessionManagement(s->s.sessionFixation(f->f.changeSessionId()).maximumSessions(2))
