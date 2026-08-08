@@ -52,7 +52,6 @@ aplicacion:
     maximo-intentos: 5
     bloqueo-minutos: 15
   reservas-publicas:
-    turnstile-secreto: ${TURNSTILE_SECRET_KEY:}
     maximo-intentos: 3
     ventana-minutos: 5
     maximo-citas-futuras-por-telefono: 2

@@ -34,7 +34,6 @@ describe('reserva pública', () => {
     const tramo = (await screen.findByText('10:00')).closest('button'); await usuario.click(tramo); await usuario.click(screen.getByRole('button', { name: 'Confirmar cita' }));
     await waitFor(() => expect(crearCita).toHaveBeenCalled());
     expect(crearCita.mock.calls[0][2]).toMatch(/[0-9a-f-]{16,}/i);
-    expect(crearCita.mock.calls[0][3]).toBe('XXXX.DUMMY.TOKEN.XXXX');
     expect(navegar).toHaveBeenCalledWith('/barberia-mimi/reserva-confirmada', expect.objectContaining({ replace: true, state: { cita: expect.objectContaining({ codigoCancelacion: '00382' }) } }));
   });
 

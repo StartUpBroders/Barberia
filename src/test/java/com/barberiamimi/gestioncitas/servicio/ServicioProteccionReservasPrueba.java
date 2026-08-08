@@ -9,13 +9,11 @@ import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
-import org.mockito.InOrder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class ServicioProteccionReservasPrueba {
-    private final ServicioTurnstile turnstile = mock(ServicioTurnstile.class);
     private final RepositorioBarberia barberias = mock(RepositorioBarberia.class);
     private final RepositorioIntentoReserva intentos = mock(RepositorioIntentoReserva.class);
     private final ServicioLimiteIntentosReserva registro = mock(ServicioLimiteIntentosReserva.class);
@@ -25,7 +23,7 @@ class ServicioProteccionReservasPrueba {
 
     @BeforeEach
     void preparar() throws Exception {
-        reset(turnstile, barberias, intentos, registro);
+        reset(barberias, intentos, registro);
         barberia = new Barberia("Barbería Mimi", "barberia-mimi");
         Field id = Barberia.class.getDeclaredField("id");
         id.setAccessible(true);
@@ -33,7 +31,7 @@ class ServicioProteccionReservasPrueba {
         when(barberias.bloquearPorSlug("barberia-mimi")).thenReturn(Optional.of(barberia));
         PropiedadesAplicacion propiedades = new PropiedadesAplicacion();
         limite = new ServicioLimiteIntentosReserva(barberias, intentos, new UtilidadCriptografica(), propiedades);
-        proteccion = new ServicioProteccionReservas(turnstile, registro);
+        proteccion = new ServicioProteccionReservas(registro);
     }
 
     @Test
@@ -53,12 +51,9 @@ class ServicioProteccionReservasPrueba {
     }
 
     @Test
-    @DisplayName("Debe registrar el intento antes de consultar Turnstile")
-    void debeContarTambienUnaVerificacionFallida() {
-        doThrow(new RuntimeException("token rechazado")).when(turnstile).validar(anyString(), anyString());
-        assertThrows(RuntimeException.class, () -> proteccion.validarIntento("barberia-mimi", "token", "198.51.100.20"));
-        InOrder orden = inOrder(registro, turnstile);
-        orden.verify(registro).registrar("barberia-mimi", "198.51.100.20");
-        orden.verify(turnstile).validar("token", "198.51.100.20");
+    @DisplayName("Debe registrar el intento de reserva")
+    void debeRegistrarIntento() {
+        proteccion.validarIntento("barberia-mimi", "198.51.100.20");
+        verify(registro).registrar("barberia-mimi", "198.51.100.20");
     }
 }

@@ -60,9 +60,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--color-primario);
 .reserva-moderna { max-width: 1120px; }
 .formulario-reserva-abierto { grid-template-columns: 1fr; align-items: start; }
 .formulario-reserva-abierto fieldset { height: 100%; }
-.comprobacion-turnstile { grid-column: 1 / -1; min-height: 0; display: grid; justify-items: center; }
-.comprobacion-turnstile:empty { display: none; }
-.comprobacion-turnstile .campo-error { text-align: center; }
 .bloque-ancho-reserva { grid-column: 1 / -1; }
 .telefono-destacado { color: #ff8597; }
 .telefono-destacado input { border-color: #9c2639; box-shadow: inset 4px 0 var(--color-primario); }
