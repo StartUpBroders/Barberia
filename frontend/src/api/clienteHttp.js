@@ -1,4 +1,4 @@
-const URL_API = (import.meta.env.VITE_API_URL || 'https://barberia-zocj.onrender.com').replace(/\/$/, '');
+const API_URL = (import.meta.env.API_URL || '').replace(/\/$/, '');
 const METODOS_ESCRITURA = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 let datosCsrf = null;
 
@@ -46,7 +46,7 @@ function mensajePorEstado(estado) {
 
 async function obtenerCsrf(forzar = false) {
   if (datosCsrf && !forzar) return datosCsrf;
-  const respuesta = await fetch(`${URL_API}/api/autenticacion/csrf`, {
+  const respuesta = await fetch(`${API_URL}/api/autenticacion/csrf`, {
     credentials: 'include',
     headers: { Accept: 'application/json' },
   });
@@ -71,7 +71,7 @@ export async function peticion(ruta, opciones = {}, reintentoCsrf = false) {
       const csrf = await obtenerCsrf(reintentoCsrf);
       cabeceras[csrf.cabecera] = csrf.token;
     }
-    const respuesta = await fetch(`${URL_API}${ruta}`, {
+    const respuesta = await fetch(`${API_URL}${ruta}`, {
       method: metodo,
       credentials: 'include',
       headers: cabeceras,
@@ -99,4 +99,4 @@ export async function peticion(ruta, opciones = {}, reintentoCsrf = false) {
   }
 }
 
-export const configuracionApi = { url: URL_API };
+export const configuracionApi = { url: API_URL };

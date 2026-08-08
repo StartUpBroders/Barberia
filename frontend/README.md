@@ -35,17 +35,17 @@ npm install
 npm run dev
 ```
 
-El frontend queda en `http://localhost:5173`. Para desarrollo, deja `VITE_API_URL` vacío: Vite enviará `/api` a `VITE_PROXY_API`, que por defecto es `http://localhost:8080`. Así las cookies se mantienen en el mismo origen del navegador y no depende del CORS del backend.
+El frontend queda en `http://localhost:5173`. La URL del backend se configura mediante `API_URL`.
 
 Variables disponibles:
 
 ```env
-VITE_API_URL=
+API_URL=https://barberia-zocj.onrender.com
 VITE_PROXY_API=http://localhost:8080
 VITE_SLUG_BARBERIA=barberia-mimi
 ```
 
-Para un despliegue separado puede definirse `VITE_API_URL=https://api.ejemplo.com`, siempre que el backend permita el origen exacto del frontend, use HTTPS y configure correctamente la cookie.
+Para un despliegue separado puede definirse `API_URL=https://api.ejemplo.com`, siempre que el backend permita el origen exacto del frontend, use HTTPS y configure correctamente la cookie.
 
 ## Sesión y CSRF
 
@@ -80,7 +80,7 @@ Las pruebas sustituyen las llamadas HTTP; no conectan con Supabase. El informe H
 ## Conexión y errores frecuentes
 
 - Si aparece “No se puede conectar”, comprueba que Spring Boot escucha en el puerto 8080.
-- Si Vite no usa el proxy, confirma que `VITE_API_URL` esté vacío y reinicia `npm run dev` tras cambiar `.env`.
+- Si cambias `API_URL`, reinicia `npm run dev` para que Vite cargue el nuevo valor de `.env`.
 - En producción, un error CORS requiere añadir el origen concreto en el backend; no se debe permitir cualquier origen con credenciales.
 - Un `403` persistente suele indicar que el token y la cookie CSRF no pertenecen a la misma sesión.
 - Un `409` al reservar significa que el hueco cambió o que existe un conflicto de idempotencia; la pantalla renueva los horarios.

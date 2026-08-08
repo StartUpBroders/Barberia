@@ -5,7 +5,10 @@ function respuesta(datos, estado = 200) {
 }
 
 describe('cliente HTTP', () => {
-  beforeEach(() => vi.resetModules());
+  beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv('API_URL', 'https://barberia-zocj.onrender.com');
+  });
 
   it('envía cookies, JSON y el token CSRF en una escritura', async () => {
     const fetchSimulado = vi.fn().mockResolvedValueOnce(respuesta({ cabecera: 'X-XSRF-TOKEN', parametro: '_csrf', token: 'token-prueba' })).mockResolvedValueOnce(respuesta({ id: 8 }, 201));

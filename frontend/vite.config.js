@@ -5,6 +5,7 @@ export default defineConfig(({ mode }) => {
   const entorno = loadEnv(mode, process.cwd(), '');
   return {
     plugins: [react()],
+    envPrefix: ['VITE_', 'API_URL'],
     server: {
       host: '0.0.0.0',
       port: 5173,

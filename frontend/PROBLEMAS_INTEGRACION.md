@@ -12,6 +12,6 @@ Cambio mínimo propuesto: crear un DTO exclusivamente administrativo con los cam
 
 `application.yml` permite por defecto `http://localhost:3000`, mientras Vite sirve este proyecto en `http://localhost:5173`.
 
-Impacto: si se configura `VITE_API_URL=http://localhost:8080`, el navegador bloqueará las llamadas desde el puerto 5173 salvo que se ajuste el origen permitido.
+Impacto: si se configura `API_URL=http://localhost:8080`, el navegador bloqueará las llamadas desde el puerto 5173 salvo que se ajuste el origen permitido.
 
-Solución aplicada: durante desarrollo `VITE_API_URL` queda vacío y el proxy de Vite reenvía `/api` a Spring Boot. Para despliegues con orígenes separados debe añadirse el origen exacto del frontend a la configuración CORS del backend; nunca un comodín con credenciales.
+Solución aplicada: `API_URL` centraliza el origen del backend. Para despliegues con orígenes separados debe añadirse el origen exacto del frontend a la configuración CORS del backend; nunca un comodín con credenciales.
